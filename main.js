@@ -1,6 +1,6 @@
 import "./utils/init.js";
 import * as THREE from "three";
-import { scene } from "./utils/init.js";
+import { camera, scene } from "./utils/init.js";
 import guiMove from "./utils/gui.js";
 
 const group = new THREE.Group();
@@ -89,6 +89,9 @@ const createLandMark = (mark) => {
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(...position);
   mesh.rotation.set(...rotation);
+  mesh.name = "mark";
+  // 自定义属性,用于点击切换场景
+  mesh.userData.attr = targetAttr;
   group.add(mesh);
 
   guiMove(mesh);
@@ -98,8 +101,17 @@ const createLandMark = (mark) => {
 const bindClick = () => {
   const rayCaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  window.addEventListener("click", () => {});
+  window.addEventListener("click", (ev) => {
+    pointer.x = (ev.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+    rayCaster.setFromCamera(pointer, camera);
+    const list = rayCaster.intersectObjects(scene.children, true);
+    const findItem = list.find((item) => item.object.name === "mark");
+    const nextScene = sceneInfo[findItem.object.userData.attr];
+    setMaterialCube(nextScene);
+  });
 };
 
 const cube = createCube();
 setMaterialCube(sceneInfo.one);
+bindClick();
