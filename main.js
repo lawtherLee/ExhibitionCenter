@@ -42,6 +42,28 @@ const sceneInfo = {
       },
     ],
   },
+  three: {
+    publicPath: "technology/3/",
+    imgUrlArr: ["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"],
+    markList: [
+      {
+        name: "landMark",
+        imgUrl: "other/landmark.png",
+        wh: [0.05, 0.05],
+        position: [0.4, -0.18, 0.32],
+        rotation: [-1.53, -0.04, -1.26],
+        targetAttr: "two", // 目标场景信息对象属性
+      },
+      {
+        name: "landMark",
+        imgUrl: "other/landmark.png",
+        wh: [0.05, 0.05],
+        position: [0.32, -0.16, -0.33],
+        rotation: [1.46, 0.1, -0.17],
+        targetAttr: "four", // 目标场景信息对象属性
+      },
+    ],
+  },
 };
 const createCube = () => {
   const geometry = new THREE.BoxGeometry();
