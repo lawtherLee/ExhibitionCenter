@@ -55,8 +55,19 @@ const createCube = () => {
   return cube;
 };
 
+// 清除上一个场景的地板标记
+const clearPrevMark = () => {
+  const list = [...group.children];
+  list.forEach((item) => {
+    item.geometry.dispose();
+    item.material.dispose();
+    group.remove(item);
+  });
+};
+
 // 纹理贴图
 const setMaterialCube = (info) => {
+  clearPrevMark();
   const { publicPath, imgUrlArr, markList } = info;
   const textureLoader = new THREE.TextureLoader();
   textureLoader.setPath(publicPath);
@@ -94,7 +105,7 @@ const createLandMark = (mark) => {
   mesh.userData.attr = targetAttr;
   group.add(mesh);
 
-  guiMove(mesh);
+  // guiMove(mesh);
 };
 
 // 与3d物体绑定点击事件
@@ -107,8 +118,10 @@ const bindClick = () => {
     rayCaster.setFromCamera(pointer, camera);
     const list = rayCaster.intersectObjects(scene.children, true);
     const findItem = list.find((item) => item.object.name === "mark");
-    const nextScene = sceneInfo[findItem.object.userData.attr];
-    setMaterialCube(nextScene);
+    if (findItem) {
+      const nextScene = sceneInfo[findItem.object.userData.attr];
+      setMaterialCube(nextScene);
+    }
   });
 };
 
