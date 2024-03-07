@@ -21,12 +21,14 @@ export let scene, camera, renderer, controls, css3DRenderer;
 // 轨道控制器
 (function createControls() {
   controls = new OrbitControls(camera, renderer.domElement);
+  controls.minPolarAngle = 0.25 * Math.PI; // 限制不看地板
+  controls.enableZoom = false; // 限制拉远拉近
 })();
 
-(function createHelper() {
-  const axesHelper = new THREE.AxesHelper(5);
-  scene.add(axesHelper);
-})();
+// (function createHelper() {
+//   const axesHelper = new THREE.AxesHelper(5);
+//   scene.add(axesHelper);
+// })();
 
 (function create3dRenderer() {
   css3DRenderer = new CSS3DRenderer();
