@@ -2,6 +2,8 @@ import "./utils/init.js";
 import * as THREE from "three";
 import { camera, scene } from "./utils/init.js";
 import guiMove from "./utils/gui.js";
+import { CSS3DObject } from "three/addons";
+import info from "three/addons/renderers/common/Info.js";
 
 const group = new THREE.Group();
 // 数据对象
@@ -64,6 +66,50 @@ const sceneInfo = {
       },
     ],
   },
+  four: {
+    publicPath: "technology/4/",
+    imgUrlArr: ["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"],
+    markList: [
+      {
+        name: "landMark",
+        imgUrl: "other/landmark.png",
+        wh: [0.05, 0.05],
+        position: [-0.35, -0.22, 0.4],
+        rotation: [-0.85, -0.45, -1.8],
+        targetAttr: "three", // 目标场景信息对象属性
+      },
+      {
+        name: "dom",
+        position: [0.49, 0, 0],
+        rotation: [0, -0.5 * Math.PI, 0],
+        targetAttr: "five", // 目标场景信息对象属性
+        active(e) {
+          setMaterialCube(sceneInfo.five);
+        },
+      },
+    ],
+  },
+  five: {
+    publicPath: "technology/5/",
+    imgUrlArr: ["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"],
+    markList: [
+      {
+        name: "landMark",
+        imgUrl: "other/landmark.png",
+        wh: [0.03, 0.03],
+        position: [-0.05, -0.05, 0.4],
+        rotation: [1.21, -0.15, -0.69],
+        targetAttr: "four", // 目标场景信息对象属性
+      },
+      {
+        name: "video",
+        imgUrl: "video/movie.mp4",
+        wh: [0.2, 0.1],
+        position: [0.49, 0.04, 0.045],
+        rotation: [0, -0.5 * Math.PI, 0],
+      },
+    ],
+  },
 };
 const createCube = () => {
   const geometry = new THREE.BoxGeometry();
@@ -81,8 +127,11 @@ const createCube = () => {
 const clearPrevMark = () => {
   const list = [...group.children];
   list.forEach((item) => {
-    item.geometry.dispose();
-    item.material.dispose();
+    // 解决原生dom没有dispose方法的报错
+    if (!item.isCSS3DObject) {
+      item.geometry.dispose();
+      item.material.dispose();
+    }
     group.remove(item);
   });
 };
@@ -105,6 +154,8 @@ const setMaterialCube = (info) => {
   // 地板上的标记
   markList.forEach((item) => {
     if (item.name === "landMark") createLandMark(item);
+    else if (item.name === "dom") createDomMark(item);
+    else if (item.name === "video") createVideoMark(item);
   });
 
   scene.add(group);
@@ -145,6 +196,45 @@ const bindClick = () => {
       setMaterialCube(nextScene);
     }
   });
+};
+
+// 原生dom前进标记
+const createDomMark = (infoObj) => {
+  const { position, rotation } = infoObj;
+  const span = document.createElement("span");
+  span.className = "mark-style";
+  span.innerHTML = "前进";
+  span.style.pointerEvents = "all";
+  // 原生dom绑定点击切换场景的事件
+  span.addEventListener("click", (e) => {
+    infoObj.active(e);
+  });
+  // 转换3D
+  const span3D = new CSS3DObject(span);
+  span3D.scale.set(1 / 800, 1 / 800, 1 / 800);
+  span3D.position.set(...position);
+  span3D.rotation.set(...rotation);
+  group.add(span3D);
+};
+
+// 创建视频标记
+const createVideoMark = (infoObj) => {
+  const { imgUrl, wh, position, rotation } = infoObj;
+  const video = document.createElement("video");
+  video.muted = false;
+  video.src = imgUrl;
+  video.addEventListener("loadedmetadata", () => {
+    video.play();
+  });
+
+  const plane = new THREE.PlaneGeometry(...wh);
+  const material = new THREE.MeshBasicMaterial({
+    map: new THREE.VideoTexture(video),
+  });
+  const mesh = new THREE.Mesh(plane, material);
+  mesh.position.set(...position);
+  mesh.rotation.set(...rotation);
+  group.add(mesh);
 };
 
 const cube = createCube();

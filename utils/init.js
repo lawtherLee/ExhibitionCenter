@@ -1,8 +1,8 @@
 // 初始化环境
 import * as THREE from "three";
-import { OrbitControls } from "three/addons";
+import { CSS3DRenderer, OrbitControls } from "three/addons";
 
-export let scene, camera, renderer, controls;
+export let scene, camera, renderer, controls, css3DRenderer;
 
 (function init() {
   scene = new THREE.Scene();
@@ -28,6 +28,16 @@ export let scene, camera, renderer, controls;
   scene.add(axesHelper);
 })();
 
+(function create3dRenderer() {
+  css3DRenderer = new CSS3DRenderer();
+  css3DRenderer.setSize(window.innerWidth, window.innerHeight);
+  css3DRenderer.domElement.style.position = "fixed";
+  css3DRenderer.domElement.style.left = "0";
+  css3DRenderer.domElement.style.top = "0";
+  css3DRenderer.domElement.style.pointerEvents = "none";
+  document.body.appendChild(css3DRenderer.domElement);
+})();
+
 (function resizeRender() {
   window.addEventListener("resize", () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -40,6 +50,7 @@ export let scene, camera, renderer, controls;
 (function renderLoop() {
   renderer.render(scene, camera);
   controls.update();
+  css3DRenderer.render(scene, camera);
   // 根据计算机浏览器刷新帧率，递归调用
   requestAnimationFrame(renderLoop);
 })();
