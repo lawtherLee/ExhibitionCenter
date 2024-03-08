@@ -30,6 +30,7 @@ export let scene, camera, renderer, controls, css3DRenderer;
 //   scene.add(axesHelper);
 // })();
 
+// 渲染客户自己创建的dom元素
 (function create3dRenderer() {
   css3DRenderer = new CSS3DRenderer();
   css3DRenderer.setSize(window.innerWidth, window.innerHeight);
